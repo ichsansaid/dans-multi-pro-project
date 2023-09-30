@@ -1,6 +1,5 @@
 package com.github.ichsansaid.java.dansmultipro.infra.security;
 
-import com.github.ichsansaid.java.dansmultipro.domain.dtos.user_dto.errors.UserInvalidCredential;
 import com.github.ichsansaid.java.dansmultipro.domain.services.jwt.JwtService;
 import com.github.ichsansaid.java.dansmultipro.domain.services.user.AuthUserService;
 import jakarta.servlet.FilterChain;
@@ -42,7 +41,7 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
             }
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserInfoDetails userDetails = this.authUserService.loadUserByUsername(username);
-                if (this.jwtService.validateToken(token, userDetails)) {
+                if (Boolean.TRUE.equals(this.jwtService.validateToken(token, userDetails))) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
@@ -50,7 +49,6 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (Exception ex) {
-            System.out.println(ex);
             resolver.resolveException(request, response, null, ex);
         }
 
